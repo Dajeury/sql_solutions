@@ -1,4 +1,4 @@
---This code is intended execute using Oracle DB
+-- Intended to work on ORACLE DB or compatily db
 SELECT CITY, VAR_LENGTH
 FROM
     (

@@ -1,3 +1,4 @@
+-- Intended to work on ORACLE DB or compatily db
 SELECT *
 FROM (
     SELECT NAME, OCCUPATION, 
