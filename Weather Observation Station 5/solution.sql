@@ -1,0 +1,17 @@
+--This code is intended execute using Oracle DB
+SELECT CITY, VAR_LENGTH
+FROM
+    (
+        SELECT 
+            CITY, 
+            LENGTH(CITY) VAR_LENGTH,
+            MIN(LENGTH(CITY)) OVER() MIN_CITY_LENGTH,
+            MAX(LENGTH(CITY)) OVER() MAX_CITY_LENGTH,
+            ROW_NUMBER() OVER(PARTITION BY LENGTH(CITY) ORDER BY LENGTH(CITY), CITY ASC) ROWNUMBER
+        FROM STATION
+        GROUP BY CITY
+    )
+WHERE 
+    ROWNUMBER = 1 
+    AND 
+    (VAR_LENGTH = MIN_CITY_LENGTH OR VAR_LENGTH = MAX_CITY_LENGTH);
