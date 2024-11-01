@@ -1,0 +1,489 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vulnerabilityAssessments_Default_storageContainerPath": {
+            "type": "SecureString"
+        },
+        "storageAccounts_dp203asdfex_name": {
+            "defaultValue": "dp203asdfex",
+            "type": "String"
+        },
+        "workspaces_azsyn_203asdfasdf_name": {
+            "defaultValue": "azsyn-203asdfasdf",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2023-05-01",
+            "name": "[parameters('storageAccounts_dp203asdfex_name')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "dnsEndpointType": "Standard",
+                "defaultToOAuthAuthentication": false,
+                "publicNetworkAccess": "Enabled",
+                "allowCrossTenantReplication": false,
+                "isSftpEnabled": false,
+                "minimumTlsVersion": "TLS1_2",
+                "allowBlobPublicAccess": false,
+                "allowSharedKeyAccess": true,
+                "largeFileSharesState": "Enabled",
+                "isHnsEnabled": true,
+                "networkAcls": {
+                    "resourceAccessRules": [
+                        {
+                            "tenantId": "f16234b3-dfe9-4531-97b9-144c53eebe88",
+                            "resourceId": "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+                        }
+                    ],
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [
+                        {
+                            "value": "38.45.46.220",
+                            "action": "Allow"
+                        }
+                    ],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "requireInfrastructureEncryption": false,
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2023-05-01",
+            "name": "[concat(parameters('storageAccounts_dp203asdfex_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_dp203asdfex_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "containerDeleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 7
+                },
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "allowPermanentDelete": false,
+                    "enabled": true,
+                    "days": 7
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices",
+            "apiVersion": "2023-05-01",
+            "name": "[concat(parameters('storageAccounts_dp203asdfex_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_dp203asdfex_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "protocolSettings": {
+                    "smb": {}
+                },
+                "cors": {
+                    "corsRules": []
+                },
+                "shareDeleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 7
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/privateEndpointConnections",
+            "apiVersion": "2023-05-01",
+            "name": "[concat(parameters('storageAccounts_dp203asdfex_name'), '/', parameters('storageAccounts_dp203asdfex_name'), '.d69fcd36-8d6e-4da6-8aff-215adaf4c248')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_dp203asdfex_name'))]"
+            ],
+            "properties": {
+                "privateEndpoint": {},
+                "privateLinkServiceConnectionState": {
+                    "status": "Approved",
+                    "description": "Automatically approved in Synapse Studio when creating an Apache Spark pool.",
+                    "actionRequired": "None"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/queueServices",
+            "apiVersion": "2023-05-01",
+            "name": "[concat(parameters('storageAccounts_dp203asdfex_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_dp203asdfex_name'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/tableServices",
+            "apiVersion": "2023-05-01",
+            "name": "[concat(parameters('storageAccounts_dp203asdfex_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_dp203asdfex_name'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces",
+            "apiVersion": "2021-06-01",
+            "name": "[parameters('workspaces_azsyn_203asdfasdf_name')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_dp203asdfex_name'))]"
+            ],
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "defaultDataLakeStorage": {
+                    "resourceId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_dp203asdfex_name'))]",
+                    "createManagedPrivateEndpoint": true,
+                    "accountUrl": "https://dp203asdfex.dfs.core.windows.net",
+                    "filesystem": "file203sadfas"
+                },
+                "encryption": {},
+                "managedVirtualNetwork": "default",
+                "managedResourceGroupName": "synapseworkspace-managedrg-39bca4f2-4e6c-4179-acb0-38be091165f3",
+                "sqlAdministratorLogin": "sqladminuser",
+                "privateEndpointConnections": [],
+                "managedVirtualNetworkSettings": {
+                    "preventDataExfiltration": false,
+                    "allowedAadTenantIdsForLinking": []
+                },
+                "publicNetworkAccess": "Enabled",
+                "cspWorkspaceAdminProperties": {
+                    "initialWorkspaceAdminObjectId": "e13c2775-95e8-4779-98bc-32314dea8115"
+                },
+                "azureADOnlyAuthentication": false,
+                "trustedServiceBypassEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/auditingSettings",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/azureADOnlyAuthentications",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "azureADOnlyAuthentication": false
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/dedicatedSQLminimalTlsSettings",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/default')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "minimalTlsVersion": "1.2"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/extendedAuditingSettings",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/firewallRules",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/allowAll')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "255.255.255.255"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/integrationruntimes",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/AutoResolveIntegrationRuntime')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "type": "Managed",
+                "typeProperties": {
+                    "computeProperties": {
+                        "location": "AutoResolve"
+                    }
+                },
+                "managedVirtualNetwork": {
+                    "referenceName": "default",
+                    "type": "ManagedVirtualNetworkReference",
+                    "id": "ddf3a2f7-59c2-4af3-b882-66b57619914c"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/privateEndpointConnections",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/', parameters('workspaces_azsyn_203asdfasdf_name'), '.synapse-ws-sql--', parameters('workspaces_azsyn_203asdfasdf_name'), '-422dad7e-981d-48e2-a385-1ab49b450ab1')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "privateEndpoint": {},
+                "privateLinkServiceConnectionState": {
+                    "status": "Approved",
+                    "description": "Approved by Microsoft.Synapse Resource Provider"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/privateEndpointConnections",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/', parameters('workspaces_azsyn_203asdfasdf_name'), '.synapse-ws-sqlOnDemand--', parameters('workspaces_azsyn_203asdfasdf_name'), '-ff6ac841-5a3c-4d2c-9acb-4440134b51a5')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "privateEndpoint": {},
+                "privateLinkServiceConnectionState": {
+                    "status": "Approved",
+                    "description": "Approved by Microsoft.Synapse Resource Provider"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/securityAlertPolicies",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": false,
+                "retentionDays": 0
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/sqlPools",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/dedsqlsdfgsd')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "sku": {
+                "name": "DW100c",
+                "capacity": 0
+            },
+            "properties": {
+                "maxSizeBytes": 263882790666240,
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "storageAccountType": "GRS",
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/vulnerabilityAssessments",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "recurringScans": {
+                    "isEnabled": false,
+                    "emailSubscriptionAdmins": true
+                },
+                "storageContainerPath": "[parameters('vulnerabilityAssessments_Default_storageContainerPath')]"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2023-05-01",
+            "name": "[concat(parameters('storageAccounts_dp203asdfex_name'), '/default/file203sadfas')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_dp203asdfex_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_dp203asdfex_name'))]"
+            ],
+            "properties": {
+                "immutableStorageWithVersioning": {
+                    "enabled": false
+                },
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/sqlPools/auditingSettings",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/dedsqlsdfgsd/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces/sqlPools', parameters('workspaces_azsyn_203asdfasdf_name'), 'dedsqlsdfgsd')]",
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/sqlPools/extendedAuditingSettings",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/dedsqlsdfgsd/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces/sqlPools', parameters('workspaces_azsyn_203asdfasdf_name'), 'dedsqlsdfgsd')]",
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/sqlPools/geoBackupPolicies",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/dedsqlsdfgsd/Default')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces/sqlPools', parameters('workspaces_azsyn_203asdfasdf_name'), 'dedsqlsdfgsd')]",
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/sqlPools/securityAlertPolicies",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/dedsqlsdfgsd/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces/sqlPools', parameters('workspaces_azsyn_203asdfasdf_name'), 'dedsqlsdfgsd')]",
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": false,
+                "retentionDays": 0
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/sqlPools/transparentDataEncryption",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/dedsqlsdfgsd/current')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces/sqlPools', parameters('workspaces_azsyn_203asdfasdf_name'), 'dedsqlsdfgsd')]",
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "status": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/sqlPools/vulnerabilityAssessments",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_azsyn_203asdfasdf_name'), '/dedsqlsdfgsd/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces/sqlPools', parameters('workspaces_azsyn_203asdfasdf_name'), 'dedsqlsdfgsd')]",
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_azsyn_203asdfasdf_name'))]"
+            ],
+            "properties": {
+                "recurringScans": {
+                    "isEnabled": false,
+                    "emailSubscriptionAdmins": true
+                }
+            }
+        }
+    ]
+}
