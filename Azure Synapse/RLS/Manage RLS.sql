@@ -105,3 +105,23 @@ GO
 EXECUTE AS USER = 'Sales1';
 SELECT * FROM dbo.Sales_ext;
 REVERT; -- Return to the original user.
+
+-- Cleaning resources
+-- Must be connected to dedicated sql pool
+DROP USER Sales1;
+DROP USER Sales2;
+DROP USER Manager;
+
+DROP SECURITY POLICY SalesFilter_ext;
+DROP TABLE Sales;
+DROP EXTERNAL TABLE Sales_ext;
+DROP EXTERNAL DATA SOURCE ext_datasource_with_abfss ;
+DROP EXTERNAL FILE FORMAT MSIFormat;
+DROP DATABASE SCOPED CREDENTIAL msi_cred; 
+DROP MASTER KEY;
+GO
+
+-- must be connected to master
+DROP LOGIN Sales1;
+DROP LOGIN Sales2;
+DROP LOGIN Manager;
